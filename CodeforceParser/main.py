@@ -1,4 +1,5 @@
 import requests
+import psycopg2
 from bs4 import BeautifulSoup
 
 
@@ -8,11 +9,35 @@ class Parser:
 
     @staticmethod
     def parse_page(page):
-        page = requests.get(f"https://codeforces.com/problemset/page/1?order=BY_SOLVED_DESC")
-        soup = BeautifulSoup(page.text, 'lxml')
-        result = soup.find("body").find("table").find_all("tr")
-        for i in range(len(result)):
-            print(next(result[i].stripped_strings))
+        URL = f"https://codeforces.com/problemset/page/{page}?order=BY_SOLVED_DESC&locale=ru"
+        page = requests.get(URL)
+
+        soup = BeautifulSoup(page.content, 'html.parser')
+        table = soup.find('div', 'datatable')
+        table_body = table.find('table')
+        rows = table_body.find_all('tr')
+
+        lister = []
+        for row in rows:
+            cols = row.find_all('td')
+            cols = [ele.text.strip() for ele in cols]
+            if cols:
+                a = cols[1]
+                a = a.replace("\r", "")
+                a = list(filter(None, a.split("\n")))
+                for i in range(len(a)):
+                    a[i] = " ".join(a[i].split())
+                name = a[0]
+                del a[0]
+                themes = " ".join(a)
+                lister.append({
+                    "Id": cols[0],
+                    "Name": name,
+                    "Type": themes,
+                    "Level": cols[3],
+                    "Solved": cols[4]
+                })
+        print(lister)
 
     def find_last_page(self):
         page = requests.get("https://codeforces.com/problemset/")
@@ -26,11 +51,11 @@ class Parser:
 
     def start_parser(self):
         self.find_last_page()
-        self.last_page = 1
         for page in range(self.last_page):
             page += 1
             self.parse_page(page)
 
 
-a = Parser()
-a.start_parser()
+if __name__ == "__main__":
+    a = Parser()
+    a.start_parser()
