@@ -1,5 +1,6 @@
 import requests
 import psycopg2
+import time
 from bs4 import BeautifulSoup
 
 
@@ -73,8 +74,13 @@ class Parser(DataBase):
 
 
 if __name__ == "__main__":
-    d = DataBase()
-    d.create_table()
-    a = Parser()
-    a.start_parser()
-    d.con.close()
+    while True:
+        d = DataBase()
+        print("Database connection")
+        d.create_table()
+        print("Table create or exist")
+        a = Parser()
+        a.start_parser()
+        print("Value update")
+        d.con.close()
+        time.sleep(3600)
