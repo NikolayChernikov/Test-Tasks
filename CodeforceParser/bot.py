@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 from main import DataBase
 
-bot = telebot.TeleBot('token')
+bot = telebot.TeleBot('6042483401:AAGAPECY9w52vEZBH83Un5JI6JFUizwz7fE')
 
 
 @bot.message_handler(commands=['start'])
@@ -22,26 +22,38 @@ def get_text_messages(message):
         markup.add(btn1, btn2)
         bot.send_message(message.from_user.id, 'Выбери что хочешь', reply_markup=markup)  # ответ бота
 
-    elif message.text == 'Выбрать сложность и задачу':
-        bot.send_message(message.from_user.id,
-                         'ВЫБРАННО',
-                         parse_mode='Markdown')
+    elif message.text == 'Выбрать сложность и тему':
+        bot.send_message(message.chat.id, "Введите сложность и тему через пробел: ")
+        bot.register_next_step_handler(message, find_by_difficulty_theme)
 
     elif message.text == 'Выбрать по номеру задачи':
         bot.send_message(message.chat.id, "Введите номер задачи: ")
-        bot.register_next_step_handler(message, add_user)
+        bot.register_next_step_handler(message, find_by_id)
 
 
-def add_user(message):
+def find_by_id(message):
     db = DataBase()
     a = str(message.text)
     db.cur.execute('''SELECT * FROM codeforseparser WHERE id = %s;''', (a,))
-    hui = db.cur.fetchall()
+    value = db.cur.fetchall()
     returned_string = ""
-    for i in range(len(hui)):
-        returned_string += str(hui[i])
+    for i in range(len(value)):
+        returned_string += str(value[i])
     bot.send_message(message.from_user.id,
                      returned_string,
+                     parse_mode='Markdown')
+
+
+def find_by_difficulty_theme(message):
+    db = DataBase()
+    a = str(message.text)
+    a = a.split(" ")
+    dif = a[0]
+    theme = a[1]
+    db.cur.execute('''SELECT * FROM codeforseparser WHERE level = %s AND themes = %s LIMIT 10;''', (dif,theme))
+    value = db.cur.fetchall()
+    bot.send_message(message.from_user.id,
+                     value,
                      parse_mode='Markdown')
 
 
