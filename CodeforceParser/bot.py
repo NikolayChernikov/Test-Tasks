@@ -52,6 +52,8 @@ def find_by_difficulty_theme(message):
     theme = a[1]
     db.cur.execute('''SELECT * FROM codeforseparser WHERE level = %s AND themes = %s LIMIT 10;''', (dif,theme))
     value = db.cur.fetchall()
+    value = ' '.join(str(el) for el in value)
+
     bot.send_message(message.from_user.id,
                      value,
                      parse_mode='Markdown')
