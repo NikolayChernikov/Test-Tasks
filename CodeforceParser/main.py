@@ -3,12 +3,33 @@ import psycopg2
 from bs4 import BeautifulSoup
 
 
-class Parser:
+class DataBase:
     def __init__(self):
+        self.con = psycopg2.connect(
+            database="postgres",
+            user="postgres",
+            password="1234",
+            host="127.0.0.1",
+            port="5432"
+        )
+        self.cur = self.con.cursor()
+
+    def create_table(self):
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS codeforseparser  
+             (ID TEXT UNIQUE,
+             NAME TEXT,
+             THEMES TEXT,
+             LEVEL TEXT,
+             SOLVED TEXT
+             );''')
+
+
+class Parser(DataBase):
+    def __init__(self):
+        super().__init__()
         self.last_page = 0
 
-    @staticmethod
-    def parse_page(page):
+    def parse_page(self, page):
         URL = f"https://codeforces.com/problemset/page/{page}?order=BY_SOLVED_DESC&locale=ru"
         page = requests.get(URL)
 
@@ -17,7 +38,6 @@ class Parser:
         table_body = table.find('table')
         rows = table_body.find_all('tr')
 
-        lister = []
         for row in rows:
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
@@ -30,14 +50,10 @@ class Parser:
                 name = a[0]
                 del a[0]
                 themes = " ".join(a)
-                lister.append({
-                    "Id": cols[0],
-                    "Name": name,
-                    "Type": themes,
-                    "Level": cols[3],
-                    "Solved": cols[4]
-                })
-        print(lister)
+                self.cur.execute(
+                    "INSERT INTO codeforseparser (ID, NAME,THEMES,LEVEL,SOLVED) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (ID) DO NOTHING",
+                    (cols[0], name, themes, cols[3], cols[4]))
+                self.con.commit()
 
     def find_last_page(self):
         page = requests.get("https://codeforces.com/problemset/")
@@ -57,5 +73,8 @@ class Parser:
 
 
 if __name__ == "__main__":
+    d = DataBase()
+    d.create_table()
     a = Parser()
     a.start_parser()
+    d.con.close()
