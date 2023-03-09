@@ -35,6 +35,8 @@ class DataBase:
         return value
 
     def find_by_difficulty_theme(self, dif, theme):
-        self.cur.execute('''SELECT * FROM codeforseparser WHERE level = %s AND themes = %s LIMIT 10;''', (dif, theme))
+        self.cur.execute(f'''SELECT * FROM codeforseparser WHERE level = '{str(dif)}' AND themes LIKE '%{str(theme)}%' LIMIT 10;
+''')
         value = self.cur.fetchall()
+        print(value)
         return value
