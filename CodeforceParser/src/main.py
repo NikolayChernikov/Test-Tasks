@@ -1,32 +1,12 @@
 import requests
-import psycopg2
 import time
 from bs4 import BeautifulSoup
-
-
-class DataBase:
-    def __init__(self):
-        self.con = psycopg2.connect(
-            database="postgres",
-            user="postgres",
-            password="1234",
-            host="127.0.0.1",
-            port="5432"
-        )
-        self.cur = self.con.cursor()
-
-    def create_table(self):
-        self.cur.execute('''CREATE TABLE IF NOT EXISTS codeforseparser  
-             (ID TEXT UNIQUE,
-             NAME TEXT,
-             THEMES TEXT,
-             LEVEL TEXT,
-             SOLVED TEXT
-             );''')
+from database import DataBase
 
 
 class Parser(DataBase):
     def __init__(self):
+        self.db = DataBase()
         super().__init__()
         self.last_page = 0
 
@@ -51,10 +31,7 @@ class Parser(DataBase):
                 name = a[0]
                 del a[0]
                 themes = " ".join(a)
-                self.cur.execute(
-                    "INSERT INTO codeforseparser (ID, NAME,THEMES,LEVEL,SOLVED) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (ID) DO NOTHING",
-                    (cols[0], name, themes, cols[3], cols[4]))
-                self.con.commit()
+                self.db.add_parsed_page(cols[0], name, themes, cols[3], cols[4])
 
     def find_last_page(self):
         page = requests.get("https://codeforces.com/problemset/")
@@ -77,10 +54,8 @@ if __name__ == "__main__":
     while True:
         d = DataBase()
         print("Database connection")
-        d.create_table()
-        print("Table create or exist")
         a = Parser()
         a.start_parser()
-        print("Value update")
+        print("Codeforce parsed")
         d.con.close()
         time.sleep(3600)
