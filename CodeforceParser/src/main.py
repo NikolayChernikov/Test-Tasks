@@ -23,14 +23,14 @@ class Parser(DataBase):
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
             if cols:
-                a = cols[1]
-                a = a.replace("\r", "")
-                a = list(filter(None, a.split("\n")))
-                for i in range(len(a)):
-                    a[i] = " ".join(a[i].split())
-                name = a[0]
-                del a[0]
-                themes = " ".join(a)
+                name_theme = cols[1]
+                name_theme = name_theme.replace("\r", "")
+                name_theme = list(filter(None, name_theme.split("\n")))
+                for i in range(len(name_theme)):
+                    name_theme[i] = " ".join(name_theme[i].split())
+                name = name_theme[0]
+                del name_theme[0]
+                themes = " ".join(name_theme)
                 self.db.add_parsed_page(cols[0], name, themes, cols[3], cols[4])
 
     def find_last_page(self):
@@ -54,8 +54,8 @@ if __name__ == "__main__":
     while True:
         d = DataBase()
         print("Database connection")
-        a = Parser()
-        a.start_parser()
+        p = Parser()
+        p.start_parser()
         print("Codeforce parsed")
         d.con.close()
         time.sleep(3600)
