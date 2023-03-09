@@ -14,7 +14,7 @@ def start(message):
     btn1 = types.KeyboardButton('Выбрать сложность и тему')
     btn2 = types.KeyboardButton('Выбрать по номеру задачи')
     markup.add(btn1, btn2)
-    bot.send_message(message.from_user.id, 'Выбери что хочешь', reply_markup=markup)
+    bot.send_message(message.from_user.id, 'Выберите тип поиска', reply_markup=markup)
 
 
 @bot.message_handler(content_types=["text"])
