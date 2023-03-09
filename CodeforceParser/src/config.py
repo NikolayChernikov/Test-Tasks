@@ -8,7 +8,7 @@ class Config(object):
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
             cls.__config = configparser.ConfigParser()
-            cls.__config.read("../deployment/configs/config.conf")
+            cls.__config.read("../deployment/config/config.conf")
 
             config = dict()
 
