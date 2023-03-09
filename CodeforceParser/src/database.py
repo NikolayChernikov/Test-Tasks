@@ -18,24 +18,26 @@ class DataBase:
                      NAME TEXT,
                      THEMES TEXT,
                      LEVEL TEXT,
-                     SOLVED TEXT
+                     SOLVED TEXT,
+                     LABEL TEXT
                      );''')
+        self.con.commit()
 
-    def add_parsed_page(self, our_id, name, themes, level, solved):
+    def add_parsed_page(self, our_id, name, themes, level, solved,label):
         self.cur.execute(
-            "INSERT INTO codeforseparser (ID, NAME,THEMES,LEVEL,SOLVED) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (ID) DO "
+            "INSERT INTO codeforseparser (ID, NAME,THEMES,LEVEL,SOLVED, LABEL) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ID) DO "
             "NOTHING",
-            (our_id, name, themes, level, solved))
+            (our_id, name, themes, level, solved,label))
         self.con.commit()
 
     def find_by_id(self, a):
-        self.cur.execute('''SELECT * FROM codeforseparser WHERE id = %s;''', (a,))
+        self.cur.execute('''SELECT ID,NAME,THEMES,LEVEL,SOLVED FROM codeforseparser WHERE id = %s;''', (a,))
         self.con.commit()
         value = self.cur.fetchall()
         return value
 
     def find_by_difficulty_theme(self, dif, theme):
-        self.cur.execute(f'''SELECT * FROM codeforseparser WHERE level = '{str(dif)}' AND themes LIKE '%{str(theme)}%' LIMIT 10;
+        self.cur.execute(f'''SELECT ID,NAME,THEMES,LEVEL,SOLVED FROM codeforseparser WHERE level = '{str(dif)}' AND label LIKE '%{str(theme)}%' LIMIT 10;
 ''')
         value = self.cur.fetchall()
         print(value)

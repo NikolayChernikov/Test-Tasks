@@ -1,5 +1,6 @@
 import requests
 import time
+import random
 from bs4 import BeautifulSoup
 from database import DataBase
 
@@ -31,7 +32,11 @@ class Parser(DataBase):
                 name = name_theme[0]
                 del name_theme[0]
                 themes = " ".join(name_theme)
-                self.db.add_parsed_page(cols[0], name, themes, cols[3], cols[4])
+                if "," in themes:
+                    label = random.choice(themes.split(","))
+                else:
+                    label = themes
+                self.db.add_parsed_page(cols[0], name, themes, cols[3], cols[4], label)
 
     def find_last_page(self):
         page = requests.get("https://codeforces.com/problemset/")
