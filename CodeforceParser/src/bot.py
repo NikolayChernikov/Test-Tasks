@@ -44,7 +44,7 @@ def find_by_difficulty_theme(message):
     data = []
     diff = message.text
     data.append(diff)
-    bot.send_message(message.chat.id, "Введите тему")
+    bot.send_message(message.chat.id, "Введите тему: ")
     bot.register_next_step_handler(message, get_url, data)
 
 
