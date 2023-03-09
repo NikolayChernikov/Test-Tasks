@@ -11,7 +11,6 @@ class Config(object):
             cls.__config.read("../deployment/configs/config.conf")
 
             config = dict()
-            config["DEFAULT"] = cls.__config["DEFAULT"]
 
             sections = cls.__config.sections()
             for section in sections:
