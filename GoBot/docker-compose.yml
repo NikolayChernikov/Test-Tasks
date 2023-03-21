@@ -1,0 +1,21 @@
+version: '3.5'
+
+services:
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: {db_password}
+
+  bot:
+    image: {image_id}
+    environment:
+      CREATE_TABLE: "yes"
+      DB_SWITCH: "on"
+      TOKEN: {bot_token}
+      HOST: db
+      PORT: 5432
+      USER: postgres
+      PASSWORD: {db_password}
+      DBNAME: {db_name}
+      SSLMODE: disable
